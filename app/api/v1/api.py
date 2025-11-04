@@ -1,12 +1,13 @@
 from fastapi import APIRouter
 from .endpoints import auth, diagnosis
+from .endpoints import questions
 
 api_router = APIRouter()
 
 # Incluimos los routers de cada funcionalidad
 api_router.include_router(auth.router, prefix="/auth", tags=["Autenticación"])
 api_router.include_router(diagnosis.router, prefix="/diagnosis", tags=["Diagnósticos"])
-
+api_router.include_router(questions.router, prefix="/questions", tags=["Questions"])
 # app/main.py
 
 from fastapi import FastAPI

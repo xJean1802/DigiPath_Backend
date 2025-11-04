@@ -1,12 +1,12 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Union
 from datetime import datetime
 
 # --- Esquema para una Respuesta Individual (Entrada de la API) ---
 # Representa una de las 20 respuestas que envía el frontend.
 class RespuestaCreate(BaseModel):
     id_pregunta: int
-    valor_respuesta_cruda: str
+    valor_respuesta_cruda: Union[str, int]
 
 # --- Esquema para la Creación de un Diagnóstico Completo (Entrada de la API) ---
 # Contiene la lista de las 20 respuestas.

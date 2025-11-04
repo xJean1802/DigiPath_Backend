@@ -2,62 +2,41 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.api import api_router
-from app.db.database import Base, engine
 
-# --- Creación de las tablas en la base de datos ---
-# Esta línea le dice a SQLAlchemy que cree todas las tablas definidas
-# en nuestros modelos si aún no existen en la base de datos.
-# Es seguro ejecutarlo cada vez; solo crea las tablas que faltan.
-def create_tables():
-    Base.metadata.create_all(bind=engine)
-
-# Llamamos a la función al iniciar la aplicación.
-create_tables()
-
-
-# --- Creación de la aplicación FastAPI ---
-# Aquí se define el objeto 'app' que Uvicorn busca.
 app = FastAPI(
     title="DigiPath API",
     description="API para el Sistema Predictivo de Madurez Digital para MYPEs Industriales.",
     version="1.0.0",
-    openapi_url="/api/v1/openapi.json",  # URL de la especificación OpenAPI
-    docs_url="/api/v1/docs"              # URL de la documentación interactiva Swagger UI
+    openapi_url="/api/v1/openapi.json",
+    docs_url="/api/v1/docs"
 )
 
+# ==============================================================================
+# CONFIGURACIÓN DE CORS
+# ==============================================================================
 
-# --- Configuración de CORS ---
-# Esto es crucial para permitir que tu frontend de React (que se ejecutará
-# en un dominio diferente, ej. localhost:3000) pueda comunicarse con este backend.
+# 2. DEFINIMOS DE DÓNDE PERMITIREMOS LAS CONEXIONES
 origins = [
-    "http://localhost",
-    "http://localhost:3000",
-    "http://localhost:5173", # Puerto común para Vite/React
-    # Cuando despliegues tu frontend, deberás añadir su URL aquí.
-    # ej. "https://mi-frontend-digipath.azurewebsites.net"
+    "http://localhost:8080",  # El origen del frontend de React en desarrollo
+    "http://localhost:5173",  # Un puerto común para Vite que a veces usa
+    # Cuando despliegues tu frontend, añadirás su URL aquí:
+    # "https://tu-frontend-en-azure.com", 
 ]
 
+# 3. AÑADIMOS EL MIDDLEWARE A LA APLICACIÓN
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=origins,  # Lista de orígenes permitidos
+    allow_credentials=True, # Permitir cookies (importante para autenticación)
+    allow_methods=["*"],    # Permitir todos los métodos (GET, POST, etc.)
+    allow_headers=["*"],    # Permitir todas las cabeceras
 )
 
 
-# --- Inclusión de las rutas de la API ---
-# Le decimos a la aplicación principal que incluya todas las rutas
-# definidas en nuestro api_router (de app/api/v1/api.py).
-# Todas las rutas tendrán el prefijo /api/v1.
+# Incluye todas las rutas de la API bajo el prefijo /api/v1
 app.include_router(api_router, prefix="/api/v1")
 
-
-# --- Endpoint de prueba en la raíz ---
-# Útil para verificar rápidamente que el servidor está funcionando.
-@app.get("/", tags=["Root"])
+# Puedes añadir rutas simples aquí si quieres
+@app.get("/")
 def read_root():
-    """
-    Endpoint raíz para verificar el estado de la API.
-    """
-    return {"message": "Bienvenido a la API de DigiPath v1"}
+    return {"message": "Welcome to DigiPath API"}
