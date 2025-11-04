@@ -12,10 +12,14 @@ class UsuarioBase(BaseModel):
 # Hereda de UsuarioBase y añade el campo de la contraseña.
 class UsuarioCreate(UsuarioBase):
     contrasena: str = Field(
-        ..., # El '...' significa que el campo es obligatorio
-        min_length=8, # Opcional: puedes exigir una longitud mínima
-        max_length=72  # <-- ¡ESTA ES LA LÍNEA CLAVE!
+        ..., 
+        min_length=8,
+        max_length=72
     )
+    # AÑADE ESTA LÍNEA
+    acepta_terminos: bool
+     
+    
 # --- Esquema para la Lectura de un Usuario (Salida de la API) ---
 # Hereda de UsuarioBase y añade los campos que queremos mostrar al exterior.
 # No incluye la contraseña por seguridad.

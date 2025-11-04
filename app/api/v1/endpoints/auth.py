@@ -53,6 +53,11 @@ class ResetPasswordRequest(BaseModel):
 # ==============================================================================
 @router.post("/register", response_model=Usuario, status_code=status.HTTP_201_CREATED)
 def register_new_user(user: UsuarioCreate, db: Session = Depends(get_db)):
+    if not user.acepta_terminos:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Debe aceptar los términos y condiciones para registrarse."
+        )
     existing = auth_service.get_user_by_email(db, user.correo_electronico)
     if existing:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El usuario ya existe")
