@@ -53,6 +53,11 @@ class ResetPasswordRequest(BaseModel):
 # ==============================================================================
 @router.post("/register", response_model=Usuario, status_code=status.HTTP_201_CREATED)
 def register_new_user(user: UsuarioCreate, db: Session = Depends(get_db)):
+    """
+    Endpoint para registrar un nuevo usuario en el sistema.
+    Valida que el usuario acepte los términos y condiciones,
+    y verifica que el correo electrónico no esté ya registrado.
+    """
     if not user.acepta_terminos:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -65,6 +70,10 @@ def register_new_user(user: UsuarioCreate, db: Session = Depends(get_db)):
 
 @router.post("/token", response_model=Token)
 def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()):
+    """
+    Endpoint de autenticación que valida las credenciales del usuario
+    y devuelve un token JWT con 30 minutos de validez.
+    """
     user = auth_service.get_user_by_email(db, form_data.username)
     if not user or not auth_service.verify_password(form_data.password, user.contrasena_hash):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Correo o contraseña inválidos")

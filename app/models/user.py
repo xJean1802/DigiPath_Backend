@@ -1,9 +1,19 @@
+# ==============================================================================
+# Modelo de Base de Datos para Usuarios
+# Define la estructura de datos para almacenar la información de usuarios
+# y sus relaciones con diagnósticos
+# ==============================================================================
+
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 import datetime
 
 class Usuario(Base):
+    """
+    Modelo para almacenar información de usuarios empresariales.
+    Incluye datos de la empresa, credenciales y relación con diagnósticos.
+    """
     __tablename__ = "Usuarios"
 
     id_usuario = Column(Integer, primary_key=True, index=True)

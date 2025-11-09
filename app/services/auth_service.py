@@ -1,3 +1,8 @@
+# ==============================================================================
+# Servicio de Autenticación y Gestión de Usuarios
+# Proporciona funciones para autenticación, gestión de contraseñas y usuarios
+# ==============================================================================
+
 from sqlalchemy.orm import Session
 import bcrypt
 from jose import JWTError, jwt

@@ -1,3 +1,9 @@
+# ==============================================================================
+# Servicio de Reportes
+# Genera reportes detallados de diagnóstico incluyendo análisis SHAP,
+# factores de impacto y recomendaciones personalizadas
+# ==============================================================================
+
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from typing import List, Dict, Any

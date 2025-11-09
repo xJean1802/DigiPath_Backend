@@ -1,3 +1,8 @@
+# ==============================================================================
+# Módulo de Endpoints para Diagnósticos
+# Maneja la creación, consulta y generación de reportes de diagnósticos
+# ==============================================================================
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
@@ -31,8 +36,15 @@ def submit_diagnosis(
     current_user: Usuario = Depends(get_current_user)
 ):
     """
-    Endpoint para que un usuario envíe las respuestas, el sistema las procese
-    con el modelo de ML y devuelva el diagnóstico completo.
+    Endpoint para procesar un nuevo diagnóstico.
+    
+    Parámetros:
+    - diagnostico_data: Contiene las 20 respuestas del cuestionario
+    - db: Conexión a la base de datos
+    - current_user: Usuario autenticado que realiza la solicitud
+    
+    El sistema procesa las respuestas utilizando el modelo de Machine Learning
+    y genera un diagnóstico completo con recomendaciones.
     """
     if len(diagnostico_data.respuestas) != 20:
         raise HTTPException(

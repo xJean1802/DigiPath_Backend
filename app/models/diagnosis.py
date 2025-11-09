@@ -1,3 +1,9 @@
+# ==============================================================================
+# Modelos de Base de Datos para Diagnósticos
+# Define las estructuras de datos para almacenar diagnósticos,
+# respuestas y valores SHAP
+# ==============================================================================
+
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, DECIMAL, Boolean
 from sqlalchemy.orm import relationship
 from .question import Pregunta
@@ -5,6 +11,10 @@ from app.db.database import Base
 import datetime
 
 class Diagnostico(Base):
+    """
+    Modelo para almacenar los diagnósticos de madurez digital.
+    Incluye puntuaciones de capacidades y nivel predicho.
+    """
     __tablename__ = "Diagnosticos"
 
     id_diagnostico = Column(Integer, primary_key=True, index=True)
@@ -19,6 +29,10 @@ class Diagnostico(Base):
     valores_shap = relationship("DiagnosticoSHAP", back_populates="diagnostico", cascade="all, delete-orphan")
 
 class Respuesta(Base):
+    """
+    Modelo para almacenar las respuestas individuales del cuestionario.
+    Guarda tanto el valor crudo como el normalizado para análisis.
+    """
     __tablename__ = "Respuestas"
 
     id_respuesta = Column(Integer, primary_key=True, index=True)
@@ -32,6 +46,10 @@ class Respuesta(Base):
 
 
 class DiagnosticoSHAP(Base):
+    """
+    Modelo para almacenar los valores SHAP del análisis de ML.
+    Identifica los drivers clave que afectan el diagnóstico.
+    """
     __tablename__ = "Diagnostico_SHAP"
 
     id_shap = Column(Integer, primary_key=True, index=True)

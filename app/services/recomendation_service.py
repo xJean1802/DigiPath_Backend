@@ -1,3 +1,9 @@
+# ==============================================================================
+# Servicio de Recomendaciones
+# Genera recomendaciones personalizadas basadas en los drivers identificados
+# en el diagnóstico de madurez digital
+# ==============================================================================
+
 from sqlalchemy.orm import Session
 from app.models.question import Recomendacion
 
