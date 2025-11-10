@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 from app.api.v1.api import api_router
 
 app = FastAPI(
@@ -11,6 +11,9 @@ app = FastAPI(
     docs_url="/api/v1/docs"
 )
 
+# --- 1. AÑADIMOS EL MIDDLEWARE PARA EL PROXY ---
+app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
+
 # ==============================================================================
 # CONFIGURACIÓN DE CORS
 # ==============================================================================
@@ -19,8 +22,7 @@ app = FastAPI(
 origins = [
     "http://localhost:8080",  # El origen del frontend de React en desarrollo
     "http://localhost:5173",  # Un puerto común para Vite que a veces usa
-    # Cuando despliegues tu frontend, añadirás su URL aquí:
-    # "https://tu-frontend-en-azure.com", 
+    "https://jolly-pond-0b0f4680f.3.azurestaticapps.net", # URL del frontend en Azure
 ]
 
 # 3. AÑADIMOS EL MIDDLEWARE A LA APLICACIÓN
@@ -36,7 +38,6 @@ app.add_middleware(
 # Incluye todas las rutas de la API bajo el prefijo /api/v1
 app.include_router(api_router, prefix="/api/v1")
 
-# Puedes añadir rutas simples aquí si quieres
 @app.get("/")
 def read_root():
     return {"message": "Welcome to DigiPath API"}
