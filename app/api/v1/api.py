@@ -27,8 +27,8 @@ app = FastAPI(
 # pueda comunicarse con este backend.
 origins = [
     "http://localhost",
-    "http://localhost:3000", # Asumiendo que React corre en el puerto 3000
-    # Añadir aquí la URL de tu frontend cuando lo despliegues
+    "http://localhost:3000",
+    "https://jolly-pond-0b0f4680f.3.azurestaticapps.net", # URL del frontend desplegado
 ]
 
 app.add_middleware(
