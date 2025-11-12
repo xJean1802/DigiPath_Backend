@@ -132,7 +132,7 @@ conf = ConnectionConfig(
 )
 
 async def send_password_reset_email(email: EmailStr, token: str):
-    frontend_reset_url = f"http://localhost:8080/reset-password?token={token}"
+    frontend_reset_url = f"{settings.FRONTEND_URL}/reset-password?token={token}"
     
     html_content = f"""
     <html>

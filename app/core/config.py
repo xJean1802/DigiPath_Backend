@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     
+    FRONTEND_URL: str = "http://localhost:8080" # Un valor por defecto para desarrollo local
     DATABASE_URL: str
     SECRET_KEY: str
     ALGORITHM: str
