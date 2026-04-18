@@ -23,7 +23,7 @@ app = FastAPI(
 )
 
 # --- Configuración de CORS ---
-# Permite que tu frontend (que se ejecutará en un dominio diferente)
+# Permite que el frontend (que se ejecutará en un dominio diferente)
 # pueda comunicarse con este backend.
 origins = [
     "http://localhost",

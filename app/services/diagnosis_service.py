@@ -128,7 +128,7 @@ def process_diagnosis(respuestas_crudas_dict: Dict[str, Any]) -> Dict[str, Any]:
     else:
         debilidades['peso_impacto'] = 0
 
-    # --- Resto de la función (sin cambios) ---
+    # --- Resto de la función ---
     desglose_dominios = _calculate_domain_scores(fila_normalizada_df)
     puntaje_cap_digital = fila_normalizada_df.loc[:, 'Q1':'Q10'].mean(axis=1).iloc[0]
     puntaje_cap_liderazgo = fila_normalizada_df.loc[:, 'Q11':'Q20'].mean(axis=1).iloc[0]
@@ -148,7 +148,7 @@ def create_and_process_diagnosis(db: Session, user_id: int, respuestas_schema: L
     """
     Servicio principal que guarda, procesa y limpia el historial de diagnósticos.
     """
-    # Lógica de limpieza del historial (sin cambios)
+    # Lógica de limpieza del historial
     diagnosticos_existentes = db.query(Diagnostico.id_diagnostico).filter(
         Diagnostico.id_usuario == user_id
     ).order_by(

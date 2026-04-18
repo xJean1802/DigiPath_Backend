@@ -9,7 +9,7 @@ from fastapi import HTTPException, status
 from typing import List, Dict, Any
 
 from app.models.diagnosis import Diagnostico as DiagnosticoModel, DiagnosticoSHAP
-from app.models.question import Recomendacion # <-- Importamos el nuevo modelo
+from app.models.question import Recomendacion
 from app.schemas.report_schema import FactorImpacto
 
 # Reutilizamos la lógica de ML del servicio de diagnóstico

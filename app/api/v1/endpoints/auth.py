@@ -12,7 +12,7 @@ router = APIRouter()
 oauth2_scheme = HTTPBearer()
 
 # ==============================================================================
-# FUNCIÓN DE DEPENDENCIA DE SEGURIDAD (MOVIDA A LA PARTE SUPERIOR)
+# FUNCIÓN DE DEPENDENCIA DE SEGURIDAD
 # ==============================================================================
 def get_current_user(token_creds: HTTPAuthorizationCredentials = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     """
@@ -65,7 +65,7 @@ def register_new_user(user: UsuarioCreate, db: Session = Depends(get_db)):
         )
     existing = auth_service.get_user_by_email(db, user.correo_electronico)
     if existing:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El usuario ya existe")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Este correo electrónico ya se encuentra registrado. Intente iniciar sesión.")
     return auth_service.create_user(db=db, user=user)
 
 @router.post("/token", response_model=Token)
@@ -122,12 +122,28 @@ async def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(
 def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):
     email = auth_service.decode_access_token(token=request.token)
     if not email:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Token inválido o expirado")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El enlace de recuperación es inválido o ha expirado. Por favor, solicite uno nuevo.")
     
     user = auth_service.get_user_by_email(db, email=email)
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No se encontró ninguna cuenta asociada a este enlace.")
 
+    # NO REPETIR CONTRASEÑA ---
+    if auth_service.verify_password(request.new_password, user.contrasena_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="La nueva contraseña no puede ser igual a la contraseña actual."
+        )
+
+    # También validamos que la nueva contraseña cumpla los requisitos de seguridad aquí
+    import re
+    patron_seguridad = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]+$'
+    if len(request.new_password) < 8 or not re.match(patron_seguridad, request.new_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="La contraseña debe tener al menos 8 caracteres, incluir una mayúscula, una minúscula, un número y un carácter especial."
+        )
+    
     user.contrasena_hash = auth_service.get_password_hash(request.new_password)
     db.commit()
 

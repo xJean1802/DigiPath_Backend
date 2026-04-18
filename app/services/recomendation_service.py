@@ -33,5 +33,3 @@ def get_recommendations_for_drivers(db: Session, drivers: list) -> list:
             })
             
     return recomendaciones_finales
-
-# Se debe hacer lo mismo para las fortalezas
