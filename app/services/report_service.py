@@ -15,7 +15,7 @@ from app.schemas.report_schema import FactorImpacto
 # Reutilizamos la lógica de ML del servicio de diagnóstico
 from app.services.diagnosis_service import process_diagnosis 
 
-def _get_factores_de_impacto(db: Session, db_shap_valores: List[DiagnosticoSHAP], tipo: str) -> List[FactorImpacto]:
+def _get_factores_de_impacto(db: Session, db_shap_valores: List[DiagnosticoSHAP], tipo: str, respuestas_dict: dict) -> List[FactorImpacto]:
     """Helper para buscar textos de recomendación y formatear los factores de impacto."""
     factores = []
     
@@ -30,13 +30,16 @@ def _get_factores_de_impacto(db: Session, db_shap_valores: List[DiagnosticoSHAP]
         ).first()
 
         if db_rec:
+            respuesta_dada = respuestas_dict.get(f"Q{shap_val.id_pregunta}", "No registrada")
             factores.append(FactorImpacto(
                 pregunta_id=f"Q{shap_val.id_pregunta}",
                 # El título del factor es el subdominio de la pregunta (ej. 'Conocimiento del Cliente')
                 titulo=db_rec.pregunta.subdominio, 
                 peso_impacto=round((abs(shap_val.valor_shap) / total_impacto_abs) * 100, 2),
                 porque=db_rec.texto_explicacion,
-                accion=db_rec.texto_recomendacion if tipo == 'DEBILIDAD' else None
+                accion=db_rec.texto_recomendacion if tipo == 'DEBILIDAD' else None,
+                respuesta_usuario=str(respuesta_dada),
+                texto_pregunta=db_rec.pregunta.texto_pregunta
             ))
     return factores
 
@@ -56,15 +59,20 @@ def generate_full_report(db: Session, db_diagnostico: DiagnosticoModel) -> Dict[
     # Fortalezas son las 3 con el valor SHAP positivo más alto
     fortalezas_shap = sorted([s for s in shap_valores if s.valor_shap > 0], key=lambda x: x.valor_shap, reverse=True)[:3]
     
-    # 3. Construir los objetos de factores de impacto con los textos de la BD
-    areas_mejora = _get_factores_de_impacto(db, debilidades_shap, 'DEBILIDAD')
-    fortalezas = _get_factores_de_impacto(db, fortalezas_shap, 'FORTALEZA')
+    # 3. Creamos el diccionario de respuestas PRIMERO
+    respuestas_crudas_dict = {f"Q{r.id_pregunta}": r.valor_respuesta_cruda for r in db_diagnostico.respuestas}
 
-    # 4. Reutilizar la lógica de ML para calcular métricas no guardadas
+    # 4. Construir los objetos de factores de impacto con los textos de la BD
+    areas_mejora = _get_factores_de_impacto(db, debilidades_shap, 'DEBILIDAD', respuestas_crudas_dict)
+    fortalezas = _get_factores_de_impacto(db, fortalezas_shap, 'FORTALEZA', respuestas_crudas_dict)
+
+    analisis_ml = process_diagnosis(respuestas_crudas_dict)
+
+    # 5. Reutilizar la lógica de ML para calcular métricas no guardadas
     respuestas_crudas_dict = {f"Q{r.id_pregunta}": r.valor_respuesta_cruda for r in db_diagnostico.respuestas}
     analisis_ml = process_diagnosis(respuestas_crudas_dict)
 
-    # 5. Ensamblar el JSON final para el frontend
+    # 6. Ensamblar el JSON final para el frontend
     reporte_final = {
         "id_diagnostico": db_diagnostico.id_diagnostico,
         "fecha_diagnostico": db_diagnostico.fecha_diagnostico.isoformat(),

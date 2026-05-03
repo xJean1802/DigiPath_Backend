@@ -7,6 +7,8 @@ class FactorImpacto(BaseModel):
     peso_impacto: float
     porque: str
     accion: str | None = None # Será None para las fortalezas
+    respuesta_usuario: str
+    texto_pregunta: str
 
 class ReporteDiagnostico(BaseModel):
     # --- Módulo 1: Resumen Ejecutivo ---

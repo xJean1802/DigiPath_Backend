@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from .endpoints import auth, diagnosis
 from .endpoints import questions
+from .endpoints import action_plan
 
 api_router = APIRouter()
 
@@ -8,6 +9,7 @@ api_router = APIRouter()
 api_router.include_router(auth.router, prefix="/auth", tags=["Autenticación"])
 api_router.include_router(diagnosis.router, prefix="/diagnosis", tags=["Diagnósticos"])
 api_router.include_router(questions.router, prefix="/questions", tags=["Questions"])
+api_router.include_router(action_plan.router, prefix="/action-plan", tags=["Action Plan (Transformación)"])
 # app/main.py
 
 from fastapi import FastAPI

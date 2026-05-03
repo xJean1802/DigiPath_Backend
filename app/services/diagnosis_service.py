@@ -72,15 +72,17 @@ def _calculate_domain_scores(fila_normalizada_df: pd.DataFrame) -> Dict[str, flo
 
 # --- Servicios Públicos ---
 
-def process_diagnosis(respuestas_crudas_dict: Dict[str, Any]) -> Dict[str, Any]:
+def process_diagnosis(respuestas_crudas_dict: Dict[str, Any] = None, fila_normalizada_df: pd.DataFrame = None) -> Dict[str, Any]:
     
     model, label_encoder, explainer = get_model_components()
     if not all([model, label_encoder, explainer]):
         raise RuntimeError("Los componentes de ML no están disponibles.")
 
-    fila_normalizada_df = _normalize_row(respuestas_crudas_dict)
+    # Si NO nos pasan el dataframe ya normalizado, lo calculamos (comportamiento normal)
+    if fila_normalizada_df is None:
+        fila_normalizada_df = _normalize_row(respuestas_crudas_dict)
 
-    # --- Predicción y Potencial (sin cambios) ---
+    # --- Predicción y Potencial ---
     prediccion_encoded = model.predict(fila_normalizada_df)[0]
     prediccion_probabilidades = model.predict_proba(fila_normalizada_df)[0]
     nivel_predicho = label_encoder.inverse_transform([prediccion_encoded])[0]
